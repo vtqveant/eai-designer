@@ -19,7 +19,7 @@ public class PostgresEmployeeRepository implements EmployeeRepository {
 
     @Override
     public Mono<Employee> findEmployeeById(String id) {
-        return Mono.just(employeeDao.findEmployeeById(Integer.parseInt(id)));
+        return Mono.justOrEmpty(employeeDao.findEmployeeById(Integer.parseInt(id)));
     }
 
     @Override

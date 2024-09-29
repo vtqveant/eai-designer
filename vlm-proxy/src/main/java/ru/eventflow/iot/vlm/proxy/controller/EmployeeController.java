@@ -1,11 +1,13 @@
 package ru.eventflow.iot.vlm.proxy.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import ru.eventflow.iot.vlm.proxy.dto.EmployeeDto;
@@ -24,7 +26,11 @@ public class EmployeeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Mono<EmployeeDto>> getEmployeeById(@PathVariable String id) {
-        return ResponseEntity.ok(employeeRepository.findEmployeeById(id).map(DomainAdapter::convert));
+        return ResponseEntity.ok(employeeRepository
+                .findEmployeeById(id)
+                .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                .map(DomainAdapter::convert)
+        );
     }
 
     @GetMapping
